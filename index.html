@@ -1,0 +1,251 @@
+import React, { useState } from 'react';
+import { 
+  Home, 
+  BarChart2, 
+  MessageCircle, 
+  Send, 
+  Layers, 
+  RotateCcw, 
+  FileText, 
+  ShoppingBag, 
+  UserPlus, 
+  ChevronLeft, 
+  ChevronRight, 
+  ChevronDown, 
+  ChevronUp,
+  Settings,
+  Database,
+  PieChart
+} from 'lucide-react';
+
+export default function App() {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState(['home']); // 預設展開「主頁」
+
+  // 選單資料結構 (三層)
+  const menuData = [
+    {
+      id: 'home',
+      title: '主頁',
+      icon: <Home size={20} />,
+      children: [
+        {
+          id: 'broadcast',
+          title: '群發訊息',
+          icon: <Send size={18} />,
+          items: ['建立新訊息', '已傳送訊息', '草稿匣']
+        },
+        {
+          id: 'step-msg',
+          title: '漸進式訊息',
+          icon: <Layers size={18} />,
+          items: ['建立漸進式訊息', '訊息列表']
+        },
+        {
+          id: 'auto-reply',
+          title: '自動回應',
+          icon: <RotateCcw size={18} />,
+          isActive: true, // 模擬圖片中的選中狀態
+          items: ['回應設定', 'AI 回應', '關鍵字回應']
+        },
+        {
+          id: 'msg-items',
+          title: '訊息項目',
+          icon: <FileText size={18} />,
+          items: ['圖文訊息', '進階影音訊息', '儲存卡訊息']
+        },
+        {
+          id: 'promotion',
+          title: '推廣相關',
+          icon: <ShoppingBag size={18} />,
+          items: ['優惠券', '集點卡', '問卷調查']
+        }
+      ]
+    },
+    {
+      id: 'analytics',
+      title: '分析',
+      icon: <BarChart2 size={20} />,
+      children: [
+        { id: 'summary', title: '總覽', icon: <PieChart size={18} />, items: [] },
+        { id: 'friends', title: '加入好友', icon: <UserPlus size={18} />, items: [] }
+      ]
+    },
+    {
+      id: 'chat',
+      title: '聊天',
+      icon: <MessageCircle size={20} />,
+      badge: 1,
+      children: []
+    }
+  ];
+
+  const toggleMenu = (id) => {
+    setExpandedMenus(prev => 
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <div className="flex h-screen bg-slate-100 overflow-hidden text-slate-700">
+      {/* 側邊欄 Sidebar */}
+      <aside className={`bg-white border-r flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
+        {/* 頂部 Logo 區 */}
+        <div className="h-14 flex items-center px-4 border-b border-slate-100 gap-3">
+          <div className="w-8 h-8 bg-green-500 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold">L</div>
+          {!isSidebarCollapsed && (
+            <div className="overflow-hidden whitespace-nowrap">
+              <p className="text-xs font-bold text-slate-800">Official Account</p>
+              <p className="text-[10px] text-slate-400">Manager</p>
+            </div>
+          )}
+        </div>
+
+        {/* 選單區域 */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
+          {menuData.map((mainMenu) => (
+            <div key={mainMenu.id} className="border-b border-slate-50">
+              {/* 第一層：大分類 */}
+              <button 
+                onClick={() => toggleMenu(mainMenu.id)}
+                className={`w-full flex items-center p-4 hover:bg-slate-50 transition-colors ${expandedMenus.includes(mainMenu.id) ? 'text-green-600' : ''}`}
+              >
+                <div className="flex-shrink-0">{mainMenu.icon}</div>
+                {!isSidebarCollapsed && (
+                  <div className="flex flex-1 items-center justify-between ml-3">
+                    <span className="font-bold text-sm">{mainMenu.title}</span>
+                    {mainMenu.badge && (
+                      <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{mainMenu.badge}</span>
+                    )}
+                    {mainMenu.children.length > 0 && (
+                      expandedMenus.includes(mainMenu.id) ? <ChevronUp size={14} /> : <ChevronDown size={14} />
+                    )}
+                  </div>
+                )}
+              </button>
+
+              {/* 第二層：功能選項 */}
+              {!isSidebarCollapsed && expandedMenus.includes(mainMenu.id) && mainMenu.children.map((subMenu) => (
+                <div key={subMenu.id} className="bg-slate-50/50">
+                  <button 
+                    onClick={() => toggleMenu(subMenu.id)}
+                    className={`w-full flex items-center px-6 py-3 hover:bg-slate-100 transition-colors ${subMenu.isActive ? 'text-green-600 border-l-4 border-green-500' : ''}`}
+                  >
+                    <div className={`flex-shrink-0 ${subMenu.isActive ? 'text-green-600' : 'text-slate-400'}`}>{subMenu.icon}</div>
+                    <span className="ml-3 text-sm flex-1 text-left">{subMenu.title}</span>
+                    {subMenu.items.length > 0 && (
+                      expandedMenus.includes(subMenu.id) ? <ChevronUp size={12} /> : <ChevronRight size={12} />
+                    )}
+                  </button>
+
+                  {/* 第三層：具體細項 */}
+                  {expandedMenus.includes(subMenu.id) && subMenu.items.length > 0 && (
+                    <div className="bg-white/50 pl-14 pr-4 py-1">
+                      {subMenu.items.map((item, idx) => (
+                        <div key={idx} className="py-2 text-xs text-slate-500 hover:text-green-600 cursor-pointer transition-colors">
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* 底部收合按鈕 */}
+        <button 
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="p-4 border-t flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          {isSidebarCollapsed ? <ChevronRight size={20} /> : <div className="flex items-center gap-2"><ChevronLeft size={20} /><span className="text-xs">收合選單</span></div>}
+        </button>
+      </aside>
+
+      {/* 主內容區 Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* 頂部導航 Topbar */}
+        <header className="h-14 bg-white border-b px-6 flex items-center justify-between shadow-sm z-10">
+          <div className="flex items-center gap-4">
+            <h2 className="font-bold text-slate-800">自動回應</h2>
+            <div className="flex gap-1">
+              <span className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">主頁</span>
+              <span className="text-xs text-slate-300">/</span>
+              <span className="text-xs text-slate-500">自動回應</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
+              <span className="text-sm font-medium">數位特約商系統</span>
+              <div className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-bold rounded">驗證帳號</div>
+            </div>
+            <Settings size={18} className="text-slate-400 cursor-pointer" />
+          </div>
+        </header>
+
+        {/* 實際內容 Area */}
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="bg-white p-6 rounded-lg border shadow-sm">
+              <h3 className="text-lg font-bold mb-4">系統儀錶板</h3>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                  <p className="text-xs text-green-600 font-bold mb-1 uppercase tracking-wider">員工綁定人數</p>
+                  <p className="text-2xl font-black text-green-700">1,284</p>
+                </div>
+                <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                  <p className="text-xs text-indigo-600 font-bold mb-1 uppercase tracking-wider">本月核銷次數</p>
+                  <p className="text-2xl font-black text-indigo-700">452</p>
+                </div>
+                <div className="p-4 bg-amber-50 rounded-lg border border-amber-100">
+                  <p className="text-xs text-amber-600 font-bold mb-1 uppercase tracking-wider">待審核廠商</p>
+                  <p className="text-2xl font-black text-amber-700">7</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-lg border shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold">最新申請廠商</h4>
+                  <button className="text-xs text-blue-500">查看全部</button>
+                </div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white rounded border flex items-center justify-center text-slate-300"><ShoppingBag size={20}/></div>
+                        <div>
+                          <p className="text-sm font-bold">阿明牛肉麵店</p>
+                          <p className="text-[10px] text-slate-400">2024/05/20 14:30 提交</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-bold">待審核</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg border shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold">CRM 員工手冊 AI 使用率</h4>
+                  <Database size={16} className="text-slate-300" />
+                </div>
+                <div className="h-40 flex items-end justify-between gap-2 px-2">
+                  {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
+                    <div key={i} className="w-full bg-green-100 rounded-t-sm relative group">
+                      <div className="bg-green-500 rounded-t-sm transition-all duration-500" style={{ height: `${h}%` }}></div>
+                      <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-400">W{i+1}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
