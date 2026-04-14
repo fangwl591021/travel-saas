@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- 左側 -->
+  <div class="sidebar" id="sidebar">
+    <div class="menu" onclick="loadPage('dashboard')">📊</div>
+    <div class="menu" onclick="loadPage('card')">👤</div>
+    <div class="menu" onclick="loadPage('link')">🔗</div>
+    <div class="menu" onclick="toggle()">☰</div>
+  </div>
+
+  <!-- 右側 -->
+  <div class="main">
+    <h2 id="title"></h2>
+    <div id="content"></div>
+  </div>
+
+</div>
+
+<script>
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+  return match ? match[1] : null;
+}
+
+const uid = getCookie("uid");
+
+function toggle() {
+  document.getElementById("sidebar").classList.toggle("collapsed");
+}
+
+function loadPage(page) {
+
+  if (page === "dashboard") {
+    document.getElementById("title").innerText = "儀錶板";
+    document.getElementById("content").innerHTML =
+      "<p>你的UID：" + uid + "</p>";
+  }
+
+  if (page === "card") {
+    document.getElementById("title").innerText = "我的名片";
+    document.getElementById("content").innerHTML =
+      "<input value='https://yourapp.com/card/" + uid + "'>";
+  }
+
+  if (page === "link") {
+    document.getElementById("title").innerText = "推廣連結";
+    document.getElementById("content").innerHTML =
+      "<input value='https://yourapp.com/trip/001?ref=" + uid + "'>";
+  }
+}
+
+loadPage("dashboard");
+</script>
+
+</body>
+</html>
