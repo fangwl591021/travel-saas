@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sakura LINE OA SaaS</title>
+<title>Sakura LINE SaaS</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -11,8 +11,102 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
 <style>
-body { margin:0; font-family: "Noto Sans TC"; }
-.sidebar-item:hover { background:#f3f4f6; cursor:pointer; }
+body {
+  margin:0;
+  font-family: "Noto Sans TC";
+  background:#f4f5f7;
+}
+
+/* LINE 主色 */
+:root {
+  --line-green:#06C755;
+  --line-dark:#05a84a;
+}
+
+/* Sidebar */
+.sidebar {
+  width:220px;
+  background:var(--line-green);
+  color:white;
+  transition:0.3s;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar.collapsed {
+  width:70px;
+}
+
+/* menu */
+.menu {
+  padding:14px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.menu:hover {
+  background:var(--line-dark);
+}
+
+/* active */
+.active {
+  background:var(--line-dark);
+  font-weight:bold;
+}
+
+/* top title */
+.brand {
+  padding:16px;
+  font-weight:bold;
+  border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+/* main */
+.main {
+  flex:1;
+  padding:20px;
+}
+
+/* card */
+.card {
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  min-width:160px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card-title {
+  color:#666;
+  font-size:14px;
+}
+
+.card-value {
+  font-size:30px;
+  font-weight:bold;
+  color:var(--line-green);
+}
+
+/* table */
+table {
+  background:white;
+  width:100%;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+th {
+  background:#f7f7f7;
+  padding:12px;
+  text-align:left;
+}
+
+td {
+  padding:12px;
+  border-top:1px solid #eee;
+}
 </style>
 </head>
 
@@ -22,109 +116,102 @@ body { margin:0; font-family: "Noto Sans TC"; }
 <script type="text/babel">
 
 const WORKER_URL = "https://你的worker網址/api/data";
-
 const { useState, useEffect } = React;
 
-/* =========================
-   APP
-========================= */
 function App() {
 
-  const [page, setPage] = useState("dashboard");
-  const [collapsed, setCollapsed] = useState(false);
+  const [page,setPage] = useState("dashboard");
+  const [collapsed,setCollapsed] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [merchants, setMerchants] = useState([]);
-  const [stats, setStats] = useState({});
+  const [merchants,setMerchants] = useState([]);
+  const [stats,setStats] = useState({});
 
-  /* =========================
-     API: 商家
-  ========================= */
-  async function fetchMerchants() {
-    setLoading(true);
-    try {
-      const res = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action:"getMerchants" })
-      });
-      const data = await res.json();
-      setMerchants(data.data || []);
-    } catch(e) {
-      console.error(e);
-    }
-    setLoading(false);
+  async function fetchMerchants(){
+    const res = await fetch(WORKER_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"getMerchants"})
+    });
+    const data = await res.json();
+    setMerchants(data.data || []);
   }
 
-  /* =========================
-     API: 統計
-  ========================= */
-  async function fetchStats() {
-    const res = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ action:"getStats" })
+  async function fetchStats(){
+    const res = await fetch(WORKER_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"getStats"})
     });
     const data = await res.json();
     setStats(data.data || {});
   }
 
-  /* =========================
-     init
-  ========================= */
-  useEffect(() => {
+  useEffect(()=>{
     fetchMerchants();
     fetchStats();
-  }, []);
+  },[]);
 
-  /* =========================
-     UI
-  ========================= */
   return (
     <div style={{display:"flex",height:"100vh"}}>
 
-      {/* ================= Sidebar ================= */}
-      <div style={{
-        width: collapsed ? 60 : 220,
-        background:"#111827",
-        color:"#fff",
-        transition:"0.3s"
-      }}>
+      {/* Sidebar */}
+      <div className={`sidebar ${collapsed?"collapsed":""}`}>
 
-        <div style={{padding:15,fontWeight:"bold"}}>
+        <div className="brand">
           {collapsed ? "S" : "Sakura SaaS"}
         </div>
 
-        <div className="sidebar-item" onClick={()=>setPage("dashboard")} style={{padding:12}}>
+        <div
+          className={`menu ${page==="dashboard"?"active":""}`}
+          onClick={()=>setPage("dashboard")}
+        >
           📊 {!collapsed && "儀表板"}
         </div>
 
-        <div className="sidebar-item" onClick={()=>setPage("merchant")} style={{padding:12}}>
+        <div
+          className={`menu ${page==="merchant"?"active":""}`}
+          onClick={()=>setPage("merchant")}
+        >
           🏪 {!collapsed && "商家管理"}
         </div>
 
-        <div className="sidebar-item" onClick={()=>setPage("stats")} style={{padding:12}}>
+        <div
+          className={`menu ${page==="stats"?"active":""}`}
+          onClick={()=>setPage("stats")}
+        >
           📈 {!collapsed && "統計"}
         </div>
 
-        <div onClick={()=>setCollapsed(!collapsed)} style={{padding:12,marginTop:20}}>
-          {collapsed ? "➡" : "⬅ 收合"}
+        <div className="menu" onClick={()=>setCollapsed(!collapsed)}>
+          ⬅ {!collapsed && "收合"}
         </div>
+
       </div>
 
-      {/* ================= Content ================= */}
-      <div style={{flex:1,background:"#f3f4f6",padding:20}}>
+      {/* Main */}
+      <div className="main">
 
         {/* DASHBOARD */}
         {page==="dashboard" && (
           <div>
-            <h1>儀表板</h1>
+            <h2>儀表板</h2>
 
             <div style={{display:"flex",gap:20}}>
 
-              <Card title="總使用次數" value={stats.total_usage || 0} />
-              <Card title="已上架商家" value={stats.approved_count || 0} />
-              <Card title="待審核" value={stats.pending_count || 0} />
+              <div className="card">
+                <div className="card-title">總使用次數</div>
+                <div className="card-value">{stats.total_usage || 0}</div>
+              </div>
+
+              <div className="card">
+                <div className="card-title">已上架商家</div>
+                <div className="card-value">{stats.approved_count || 0}</div>
+              </div>
+
+              <div className="card">
+                <div className="card-title">待審核</div>
+                <div className="card-value">{stats.pending_count || 0}</div>
+              </div>
 
             </div>
           </div>
@@ -133,67 +220,47 @@ function App() {
         {/* MERCHANT */}
         {page==="merchant" && (
           <div>
-            <h1>商家管理</h1>
+            <h2>商家管理</h2>
 
             <button onClick={fetchMerchants}>
               重新整理
             </button>
 
-            {loading ? <p>Loading...</p> : (
+            <table style={{marginTop:20}}>
+              <thead>
+                <tr>
+                  <th>名稱</th>
+                  <th>分類</th>
+                  <th>使用次數</th>
+                  <th>狀態</th>
+                </tr>
+              </thead>
 
-              <table border="1" cellPadding="8" style={{marginTop:20,background:"#fff"}}>
-                <thead>
-                  <tr>
-                    <th>名稱</th>
-                    <th>分類</th>
-                    <th>使用次數</th>
-                    <th>狀態</th>
+              <tbody>
+                {merchants.map((m,i)=>(
+                  <tr key={i}>
+                    <td>{m.名稱}</td>
+                    <td>{m.分類}</td>
+                    <td style={{color:"#06C755",fontWeight:"bold"}}>
+                      {m.使用次數}
+                    </td>
+                    <td>{m.狀態}</td>
                   </tr>
-                </thead>
+                ))}
+              </tbody>
+            </table>
 
-                <tbody>
-                  {merchants.map((m,i)=>(
-                    <tr key={i}>
-                      <td>{m.名稱}</td>
-                      <td>{m.分類}</td>
-                      <td>{m.使用次數}</td>
-                      <td>{m.狀態}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-            )}
           </div>
         )}
 
         {/* STATS */}
         {page==="stats" && (
           <div>
-            <h1>統計分析</h1>
+            <h2>統計</h2>
             <pre>{JSON.stringify(stats,null,2)}</pre>
           </div>
         )}
 
-      </div>
-    </div>
-  );
-}
-
-/* =========================
-   CARD
-========================= */
-function Card({title,value}) {
-  return (
-    <div style={{
-      background:"#fff",
-      padding:20,
-      borderRadius:10,
-      minWidth:150
-    }}>
-      <div>{title}</div>
-      <div style={{fontSize:28,fontWeight:"bold"}}>
-        {value}
       </div>
     </div>
   );
