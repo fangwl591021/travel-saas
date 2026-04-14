@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  font-family: Arial;
+}
+
+.container {
+  padding: 20px;
+}
+
+input {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  width: 100%;
+  background: #06c755;
+  color: white;
+  border: none;
+}
+
+/* 後台 */
+.layout {
+  display: flex;
+}
+
+.sidebar {
+  width: 220px;
+  background: #0e1a2b;
+  color: white;
+  transition: 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.menu {
+  padding: 15px;
+  cursor: pointer;
+}
+
+.menu:hover {
+  background: #1f2d44;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+}
