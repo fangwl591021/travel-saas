@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+  <h2>業務註冊</h2>
+
+  <input id="name" placeholder="姓名">
+  <input id="phone" placeholder="電話">
+
+  <button onclick="register()">註冊</button>
+</div>
+
+<script>
+async function register() {
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+
+  const res = await fetch("https://你的worker網址/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, phone })
+  });
+
+  const data = await res.json();
+
+  alert("你的UID：" + data.uid);
+
+  window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>
